@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="../static/css/home-page.css">
+
+    <script>
+        function getCookie(cname) {
+            var name = cname + "=";
+            var decodedCookie = decodeURIComponent(document.cookie);
+            var ca = decodedCookie.split(';');
+            for(var i = 0; i <ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        function creaPartita() {
+            if(document.cookie.length != 0){
+                if(!confirm("C'è già una partita creata, vuoi sovrascrivere i dati?"))
+                    return;
+            }
+            window.location = window.location.href + "creapartita";
+        }
+        function trovaPartita() {
+            var typedid = document.getElementById("idpartita").value;
+            if(typedid == ""){
+                alert("Campo 'ID Partita' è richiesto");
+                return;
+            }
+            if(document.cookie.length != 0){
+                if(getCookie("id") == typedid){
+                    alert("Sei il proprietario della partita inserita, clicca su 'Continua' per rientrarci");
+                    return;
+                }
+                else{
+                    if(confirm("Ci sono dei dati salvati, vuoi sovrascriverli?"))
+                        window.location = window.location.href + "trovapartita?idpartita=" + typedid;
+                    else return;
+                }
+            }
+            window.location = window.location.href + "trovapartita?idpartita=" + typedid;
+        }
+    </script>
+</head>
+</head>
+<body>
+    <h1>Hello!</h1>
+    <p>Welcome to <span th:text="${appName}">Our App</span></p>
+    <button onclick="creaPartita()">Crea Partita</button>
+    <br><br>
+    <input type="text" id="idpartita" name="idpartita" placeholder="ID Partita"><br>
+    <button onclick="trovaPartita()">Unisciti alla partita</button>
+</body>
+</html>

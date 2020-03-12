@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Unibo Corriere</title>
+</head>
+<body>
+<h1>Partita Non Trovata</h1>
+<p>Codice partita inserito: <span th:text="${idPartita}">##</span></p>
+
+<form th:attr="action=${homeurl}"><button type="submit">Torna alla home</button></form>
+</body>
+</html>
