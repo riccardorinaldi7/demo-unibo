@@ -2,6 +2,7 @@ package com.example.demo.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,5 +56,15 @@ public class Utilities {
         Collections.shuffle(deck);
         System.out.println(deck.toString());
         return deck;
+    }
+
+    public static ArrayList<String> inizializzaColori() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("blue");
+        list.add("yellow");
+        list.add("green");
+        list.add("cyan");
+        list.add("black");
+        return list;
     }
 }

@@ -1,10 +1,10 @@
 package com.example.demo.model;
 
 import com.example.demo.util.Utilities;
-import jdk.nashorn.internal.objects.IteratorResult;
 
+import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Game {
@@ -12,15 +12,17 @@ public class Game {
     private List<Player> players;
     private List<String> occasioni;
     private List<String> esperienze;
-    private final String[] colors = {"blue", "yellow", "green", "black", "cyan"};
-    private int nextcolor = 0;
+    private ArrayList<String> colors;
+    private ListIterator<String> colorsIterator;
 
     // constructors
 
     public Game() {
         this.occasioni = Utilities.inizializzaOccasioni();
         this.esperienze = Utilities.inizializzaEsperienze();
-        this.players = new LinkedList<>();
+        this.colors = Utilities.inizializzaColori();
+        this.colorsIterator = colors.listIterator();
+        this.players = new ArrayList<>();
 
         if(occasioni.isEmpty() || esperienze.isEmpty()){
             System.out.println("Nessuna carta caricata");
@@ -56,8 +58,21 @@ public class Game {
     }
 
     public String nextColor() throws IndexOutOfBoundsException {
-        String color = colors[nextcolor];
-        nextcolor++;
+        String color = null;
+        if(colorsIterator.hasNext()){
+            color =  colorsIterator.next();
+            colorsIterator.remove();
+        }
+        if(colorsIterator.hasPrevious()){
+            color =  colorsIterator.previous();
+            colorsIterator.remove();
+        }
         return color;
+    }
+
+    public boolean hasplayer(String nomegiocatore) {
+        Iterator<Player> i = players.iterator();
+        while (i.hasNext()){ if(i.next().getNome().equals(nomegiocatore)) return true; }
+        return false;
     }
 }

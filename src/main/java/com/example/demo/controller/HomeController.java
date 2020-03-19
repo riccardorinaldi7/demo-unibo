@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -52,39 +53,40 @@ public class HomeController {
     }
 
     @GetMapping("/trovapartita")
-    public String trovaPartita(Model model, HttpServletResponse response, @RequestParam String idpartita){
+    public String trovaPartita(Model model, HttpServletResponse response, @RequestParam String idpartita, @CookieValue(defaultValue = "") String nomegiocatore){
         Game game = appSession.getGame(idpartita);
         model.addAttribute("idpartita", idpartita);
 
         if(game != null){
-            try {
-                String nomeGiocatore = game.nextColor();
-                System.out.println("Inserisco giocatore: " + nomeGiocatore);
-                if (game.addPlayer(nomeGiocatore)) {
-                    String giocatori = game.getPlayers().toString();
+            if(!nomegiocatore.equals("") && game.hasplayer(nomegiocatore)){
+                model.addAttribute("giocatori", game.getPlayers().toString());
+                return "partitatrovata";
+            }
+            else {
+                String nome = game.nextColor();
+                //System.out.println("Inserisco giocatore: " + nomeGiocatore);
+
+                if (nome != null && game.addPlayer(nome)) {
 
                     //setto i cookie per idpartita e nomegiocatore
                     Cookie idcookie = new Cookie("idpartita", String.valueOf(idpartita));
-                    Cookie namecookie = new Cookie("nomegiocatore", nomeGiocatore);
+                    Cookie namecookie = new Cookie("nomegiocatore", nome);
                     response.addCookie(idcookie);
                     response.addCookie(namecookie);
 
-                    model.addAttribute("giocatori", giocatori);
+                    model.addAttribute("giocatori", game.getPlayers().toString());
                     return "partitatrovata";
                 } else {
-                    model.addAttribute("messaggioerrore", "Errore aggiunta giocatore");
+                    model.addAttribute("messaggioerrore", "Raggiunto massimo numero giocatori");
                     model.addAttribute("homeurl", homeurl);
                     return "error";
                 }
-            }catch (IndexOutOfBoundsException e){
-                model.addAttribute("messaggioerrore", "Numero max giocatori raggiunto");
-                model.addAttribute("homeurl", homeurl);
-                return "error";
             }
         }else{
             model.addAttribute("messaggioerrore", "Partita non trovata");
             model.addAttribute("homeurl", homeurl);
-            return "error";}
+            return "error";
+        }
 
     }
 
