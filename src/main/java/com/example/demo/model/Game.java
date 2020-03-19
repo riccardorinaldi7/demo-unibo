@@ -55,7 +55,9 @@ public class Game {
         return false;
     }
 
-    public String nextColor() {
-        return colors[nextcolor++];
+    public String nextColor() throws IndexOutOfBoundsException {
+        String color = colors[nextcolor];
+        nextcolor++;
+        return color;
     }
 }

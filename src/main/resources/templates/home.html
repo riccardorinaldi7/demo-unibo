@@ -22,9 +22,13 @@
             return "";
         }
 
+        function printGameCookie(){
+            return "id=" + getCookie("idpartita") + " - colore=" + getCookie("nomegiocatore");
+        }
+
         function creaPartita() {
             if(document.cookie.length != 0){
-                if(!confirm("C'è già una partita creata, vuoi sovrascrivere i dati?"))
+                if(!confirm("C'è già una partita creata, vuoi sovrascrivere i dati?\n" + printGameCookie()))
                     return;
             }
             window.location = window.location.href + "creapartita";
@@ -36,17 +40,17 @@
                 return;
             }
             if(document.cookie.length != 0){
-                if(getCookie("id") == typedid){
-                    alert("Sei il proprietario della partita inserita, clicca su 'Continua' per rientrarci");
+                if(getCookie("idpartita") === typedid){
+                    window.location = window.location.href + "trovapartita?idpartita=" + typedid;
                     return;
                 }
                 else{
-                    if(confirm("Ci sono dei dati salvati, vuoi sovrascriverli?"))
+                    if(confirm("Ci sono dei dati salvati, vuoi sovrascriverli?\n" + printGameCookie()))
                         window.location = window.location.href + "trovapartita?idpartita=" + typedid;
                     else return;
                 }
             }
-            window.location = window.location.href + "trovapartita?idpartita=" + typedid;
+            else window.location = window.location.href + "trovapartita?idpartita=" + typedid;
         }
     </script>
 </head>

@@ -2,18 +2,15 @@ package com.example.demo.controller;
 
 import com.example.demo.model.AppSession;
 import com.example.demo.model.Game;
-import com.example.demo.model.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Iterator;
 
 @Controller
 public class HomeController {
@@ -43,40 +40,51 @@ public class HomeController {
         appSession.addGame(id, game);
 
         //setto i cookie per idpartita e nomegiocatore
-        Cookie idcookie = new Cookie("id", String.valueOf(id));
-        Cookie namecookie = new Cookie("nomeGiocatore", nomeGiocatore);
+        Cookie idcookie = new Cookie("idpartita", String.valueOf(id));
+        Cookie namecookie = new Cookie("nomegiocatore", nomeGiocatore);
         response.addCookie(idcookie);
         response.addCookie(namecookie);
 
         //scrivo i campi per la pagina successiva
-        model.addAttribute("idPartita", id);
-        model.addAttribute("nomeGiocatore", nomeGiocatore);
+        model.addAttribute("idpartita", id);
+        model.addAttribute("nomegiocatore", nomeGiocatore);
         return "creapartita";
     }
 
     @GetMapping("/trovapartita")
     public String trovaPartita(Model model, HttpServletResponse response, @RequestParam String idpartita){
         Game game = appSession.getGame(idpartita);
-        model.addAttribute("idPartita", idpartita);
+        model.addAttribute("idpartita", idpartita);
 
         if(game != null){
-            String nomeGiocatore = game.nextColor();
-            if(game.addPlayer(nomeGiocatore)) {
-                String giocatori = game.getPlayers().toString();
+            try {
+                String nomeGiocatore = game.nextColor();
+                System.out.println("Inserisco giocatore: " + nomeGiocatore);
+                if (game.addPlayer(nomeGiocatore)) {
+                    String giocatori = game.getPlayers().toString();
 
-                //setto i cookie per idpartita e nomegiocatore
-                Cookie idcookie = new Cookie("id", String.valueOf(idpartita));
-                Cookie namecookie = new Cookie("nomeGiocatore", nomeGiocatore);
-                response.addCookie(idcookie);
-                response.addCookie(namecookie);
+                    //setto i cookie per idpartita e nomegiocatore
+                    Cookie idcookie = new Cookie("idpartita", String.valueOf(idpartita));
+                    Cookie namecookie = new Cookie("nomegiocatore", nomeGiocatore);
+                    response.addCookie(idcookie);
+                    response.addCookie(namecookie);
 
-                model.addAttribute("giocatori", giocatori);
-                return "trovapartita";
+                    model.addAttribute("giocatori", giocatori);
+                    return "partitatrovata";
+                } else {
+                    model.addAttribute("messaggioerrore", "Errore aggiunta giocatore");
+                    model.addAttribute("homeurl", homeurl);
+                    return "error";
+                }
+            }catch (IndexOutOfBoundsException e){
+                model.addAttribute("messaggioerrore", "Numero max giocatori raggiunto");
+                model.addAttribute("homeurl", homeurl);
+                return "error";
             }
-            else{return "error";}
         }else{
+            model.addAttribute("messaggioerrore", "Partita non trovata");
             model.addAttribute("homeurl", homeurl);
-            return "partitainesistente";}
+            return "error";}
 
     }
 
